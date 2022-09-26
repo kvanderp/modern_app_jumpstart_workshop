@@ -120,7 +120,7 @@ kind: Deployment
 metadata:
   name: recommendations
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: recommendations
