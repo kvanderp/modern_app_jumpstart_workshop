@@ -80,24 +80,25 @@ To access the K8s API, you will need to download a kubeconfig file from the K3s 
 
 Now that we have connectivity to the Kubernetes API, we will deploy the Brewz app into the k3s Kubernetes cluster. The manifest files describing the database, the containers to be deployed and proxy ingress configuration has been provided for you by the Brewz development team as a result of their initial investment in breaking down the monolithic application into separate containers. The manifest files provided will create a series of resources in Kubernetes that represent the application deployment, such as ConfigMaps, Deployments, Services, and a Virtual Server.
 
-Once deployed into Kubernetes, the Brews deployment will look like this:
+Once deployed into Kubernetes, the Brewz deployment will look like this:
 
-<img src="../assets/brews-k8s-initial.svg" alt="Initial k8s arch" width="400"/>
+<img src="../assets/brewz-k8s-initial.svg" alt="Initial k8s arch" width="400"/>
 
 > **Note:** The NGINX Ingress Controller has been introduced as a proxy to the APIs, serving as an **API Gateway**.
 
 1. On your local machine, open a terminal to the directory that you cloned your repository into and run the following commands:
 
     ```bash
-    cd manifests/brewz
-    kubectl apply -f mongo-init.yaml
-    kubectl apply -f app.yaml
-    kubectl apply -f virtual-server.yaml
+    kubectl apply -f manifests/brewz/mongo-init.yaml
+    kubectl apply -f manifests/brewz/app.yaml
+    kubectl apply -f manifests/brewz/virtual-server.yaml
     ```
 
 1. Use the **Brewz** UDF access method of the **k3s** component to explore the deployed app in your browser. Click the "BREWZ" title link to navigate to the main product catalog.
 
 ## GitOps with Argo CD
+
+For the remainder of this lab, we will no longer be manually deploying applications with kubectl. We will be practicing [GitOps](https://www.gitops.tech/) for [Continuous Deployment](https://en.wikipedia.org/wiki/Continuous_deployment) of our applications. [Argo CD](https://argo-cd.readthedocs.io/en/stable/) is the tool we will be using to watch your forked repository for changes, and automatically deploy updated resources to Kubernetes for you. In this lab, Argo CD is already installed for you in your Kubernetes cluster.
 
 ### Obtain the Argo CD password
 
@@ -127,6 +128,8 @@ Once deployed into Kubernetes, the Brews deployment will look like this:
     Argo CD will initiate an initial "sync" which will update the manually deployed application with the manifests in your GitHub repo. If successful, you should see this:
 
     ![Argo sync summary](../assets/argo_sync_summary.png)
+
+    > **Note:** If this takes more than a couple minutes, you may need to click the **Refresh** button on the **brewz** application card to update its status.
 
 1. Click anywhere in the **brewz** application card pictured above. You will be presented with a diagram of all the k8s resources that have been deployed:
 

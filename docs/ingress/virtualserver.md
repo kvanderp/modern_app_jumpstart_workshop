@@ -169,6 +169,8 @@ One of the advantages the NGINX Plus Ingress Controller provides is the ability 
 
 1. Commit the `manifests/brewz/virtual-server.yaml` file to your local repository, then push it to your remote repository. Argo CD will pick up the most recent changes, and deploy them for you.
 
+    > **Note:** In the UDF environment, at times Argo CD may not immediately detect and deploy the changes. If this is the case, click the **Refresh** button on the **brewz** application in Argo CD.
+
 1. Run the following command on the K3s server via the UDF *SSH* or *Web Shell* Access Methods to test that our API services is still up and has a health check:
 
     ```bash
@@ -179,7 +181,7 @@ One of the advantages the NGINX Plus Ingress Controller provides is the ability 
 
 ## ErrorPage
 
-While the Brews developers were able to break their monolith application into microservices, their APIs are not always returning a JSON response.  A good example is when you lookup a product that does not exist.  The API returns a 400 HTTP response code but the body payload is *"Could not find the product!"*.
+While the Brewz developers were able to break their monolith application into microservices, their APIs are not always returning a JSON response. A good example is when you lookup a product that does not exist. The API returns a 400 HTTP response code but the body payload is *"Could not find the product!"*.
 
 1. Run the following command on the K3s server via the UDF *SSH* or *Web Shell* Access Methods to test this output:
 
@@ -189,9 +191,11 @@ While the Brews developers were able to break their monolith application into mi
     curl -k https://$HOST/api/products/1234
     ```
 
-    > Ideally, the development team will fix this issue in the API code but we can also help by performing a quick fix via our VirtualServer configuration.
+    Ideally, the development team will fix this issue in the API code but we can also help by performing a quick fix via our VirtualServer configuration.
 
-1. In VSCode, open the `manifests/brewz/virtual-server.yaml` file and add an `errorPages` resource to the `routes` -> `api` path; example below.
+    > **Note:** Since the error response override we will be adding in the next steps could apply to multiple `404` entities on the api (users, products, cart, etc), we will generically use the term "resource" when creating the error response override.
+
+1. In VSCode, open the `manifests/brewz/virtual-server.yaml` file and add an `errorPages` resource to the `routes` -> `/api` path; example below.
 
     ```yaml
     ---
@@ -229,7 +233,7 @@ While the Brews developers were able to break their monolith application into mi
                 code: 404
                 type: application/json
                 body: |
-                  {\"msg\": \"Could not find the product!\"}
+                  {\"msg\": \"Could not find the resource!\"}
                 headers:
                   - name: x-debug-original-status
                     value: ${upstream_status}
@@ -242,6 +246,8 @@ While the Brews developers were able to break their monolith application into mi
 
 1. Commit the `manifests/brewz/virtual-server.yaml` file to your local repository, then push it to your remote repository. Argo CD will pick up the most recent changes, and deploy them for you.
 
+    > **Note:** In the UDF environment, at times Argo CD may not immediately detect and deploy the changes. If this is the case, click the **Refresh** button on the **brewz** application in Argo CD.
+
 1. Now, check that an unknown product returns a JSON object by running the following command on the K3s server:
 
     ```bash
@@ -250,7 +256,7 @@ While the Brews developers were able to break their monolith application into mi
     curl -k https://$HOST/api/products/1234
     ```
 
-    > Your output should look like: `{"msg": "Could not find the product!"}`
+    > Your output should look like: `{"msg": "Could not find the resource!"}`
 
 ## TLS
 
@@ -277,7 +283,7 @@ Since you are running this lab in a closed ecosystem (UDF), you do not have the 
     - Organization Name: F5
     - Organizational Unit Name: Brewz
     - Common Name: brewz.f5demo.com
-    - Email Address: brewsz@f5demo.com
+    - Email Address: brewz@f5demo.com
 
 ### Create K8s Secret for the Cert and Key
 
@@ -318,8 +324,8 @@ The final step is to update our Brewz VirtualServer resource to leverage the new
 1. In VSCode, open the `manifests/brewz/virtual-server.yaml` file and add the following fields to the virtual server:
 
     ```yaml
-    tls:
-      secret: brewz-tls
+      tls:
+        secret: brewz-tls
     ```
 
     The final file should look like the example below:
@@ -377,7 +383,7 @@ The final step is to update our Brewz VirtualServer resource to leverage the new
                 code: 404
                 type: application/json
                 body: |
-                  {\"msg\": \"Could not find the product!\"}
+                  {\"msg\": \"Could not find the resource!\"}
                 headers:
                   - name: x-debug-original-status
                     value: ${upstream_status}
@@ -400,6 +406,8 @@ The final step is to update our Brewz VirtualServer resource to leverage the new
     ```
 
 1. Commit the `manifests/brewz/virtual-server.yaml` file to your local repository, then push it to your remote repository. Argo CD will pick up the most recent changes, and deploy them for you.
+
+    > **Note:** In the UDF environment, at times Argo CD may not immediately detect and deploy the changes. If this is the case, click the **Refresh** button on the **brewz** application in Argo CD.
 
 ### Check the status of our virtual server
 

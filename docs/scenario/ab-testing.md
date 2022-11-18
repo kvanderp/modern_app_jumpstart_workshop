@@ -4,11 +4,11 @@ Unsurprisingly, marketing has been interested in how to improve the look and fee
 
 NGINX Ingress Controller's traffic splitting features are an ideal fit for this use case, as the conditional logic for this testing period becomes a matter of configuration rather than code. In addition to this particular scenario - called "A/B Testing", NGINX Ingress Controller also supports other deployment patters such as Canary, Blue-Green, and Debug routing.
 
-The development team has already been hard at work updating the Brewz spa app with the new user experience, and has published a version of it to the container registry. Fortunately due to the refactoring we performed earlier in the lab, the development team no longer has to deploy the entire application in order to make front-end changes, as when they had to when the app was monolithic in nature.
+The development team has already been hard at work updating the Brewz SPA app with the new user experience, and has published a version of it to the container registry. Fortunately due to the refactoring we performed earlier in the lab, the development team no longer has to deploy the entire application in order to make front-end changes, as when they had to when the app was monolithic in nature.
 
 ## Update the Brewz Deployment and Virtual Server
 
-We need to deploy the new variant of the spa application, so we can conditionally route traffic to it.
+We need to deploy the new variant of the SPA application, so we can conditionally route traffic to it.
 
 1. In your fork of the lab repository, append the following yaml snippet to the `manifests/brewz/app.yaml` file and save it:
 
@@ -30,7 +30,7 @@ We need to deploy the new variant of the spa application, so we can conditionall
         spec:
           containers:
             - name: spa-dark
-              image: ghcr.io/f5devcentral/spa-demo-app-spa:sha-c02c49a
+              image: ghcr.io/f5devcentral/spa-demo-app-spa-dark:sha-033b779
               ports:
                 - containerPort: 80
     ---
@@ -49,7 +49,7 @@ We need to deploy the new variant of the spa application, so we can conditionall
 
     ```
 
-    > **Note:** The new `spa-dark` deployment uses a different tag than the existing `spa` deployment. In addition to a new `Deployment` resource, we are introducing a new `Service` resource for it so we can route traffic to it.
+    > **Note:** In addition to a new `Deployment` resource, we are introducing a new `Service` resource so we can route traffic to the new SPA application variant.
 
 1. Append the following yaml snippet to the list of `upstreams` in the `manifests/brewz/virtual-server.yaml` file:
 
@@ -79,15 +79,17 @@ We need to deploy the new variant of the spa application, so we can conditionall
 
 1. Commit the `manifests/brewz/virtual-server.yaml` and `manifests/brewz/app.yaml` files to your local repository, then push them to your remote repository. Argo CD will pick up the most recent changes, and deploy them for you.
 
-1. Open the `Brewz` UDF access method on the `k3s` component. Note that the application looks the same as it has been in previous labs.
+    > **Note:** In the UDF environment, at times Argo CD may not immediately detect and deploy the changes. If this is the case, click the **Refresh** button on the **brewz** application in Argo CD.
 
-1. Open the `Brewz` UDF access method in a new tab, and open the developer tools.
+1. Open the **Brewz** UDF access method on the **k3s** component. Note that the application looks the same as it has been in previous labs.
+
+1. Open the **Brewz** UDF access method in a new tab, and open the developer tools.
 
 1. Manually add the `app_version` cookie with a value of `dark` to the developer tools window. Methods vary depending on which browser you are using, but if using Chrome click on the Application tab, and expand the cookies section for the UDF url you are accessing. Add a new cookie by double clicking the table after the existing cookie entries. Enter `app_version` in the first column, hit tab and enter `dark` in the next column. The rest of the defaults will suffice. When complete, it should look similar to this screenshot:
 
     <img src="../assets/chrome-cookie.png" alt="Cookie view in Chrome Developer Tools panel" width="600"/>
 
-1. Refresh the tab in Chrome. You should see a different design for the Brews application, notably that the background and font colors are different.
+1. Refresh the tab in Chrome. You should see a different design for the Brewz application, notably that the background and font colors are different.
 
 ## Next Steps
 

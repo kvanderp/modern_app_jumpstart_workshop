@@ -101,9 +101,11 @@ The development team has developed and created a container image of the recommen
 
 1. Commit the `manifests/brewz/virtual-server.yaml` and `manifests/brewz/app.yaml` files to your local repository, then push them to your remote repository. Argo CD will pick up the most recent changes, and deploy them for you.
 
-    > **Note:** Once the configuration is deployed, NGINX Ingress Controller will reload NGINX, and the **Reloads** metric on the Grafana dashboard should increment.
+    > **Note:** In the UDF environment, at times Argo CD may not immediately detect and deploy the changes. If this is the case, click the **Refresh** button on the **brewz** application in Argo CD.
 
-1. Once deployed, use the **Hey** utility on your laptop to request the **recommendations** service directly as if the Brews SPA application was doing so:
+    Once the configuration is deployed, NGINX Ingress Controller will reload NGINX, and the **Reloads** metric on the Grafana dashboard should increment.
+
+1. Use the **Hey** utility on your laptop to request the **recommendations** service directly as if the Brewz SPA application was doing so:
 
     ```bash
     BREWZ_URL=<Your Brewz UDF access method url>
@@ -133,7 +135,9 @@ The DevOps and the application owners aren't willing to allow this error conditi
 
 1. Argo CD will pick up the most recent changes, and deploy them for you. Check the brewz `VirtualServer` resource under the `brewz` application to check that the revert was successful.
 
-1. Once the revert is successful, use the **Hey** utility on your laptop to request the **recommendations** service directly as if the Brews SPA application was doing so:
+    > **Note:** In the UDF environment, at times Argo CD may not immediately detect and deploy the changes. If this is the case, click the **Refresh** button on the **brewz** application in Argo CD.
+
+1. Once the revert is successful, use the **Hey** utility on your laptop to request the **recommendations** service directly as if the Brewz SPA application was doing so:
 
     ```bash
     BREWZ_URL=<Your Brewz UDF access method url>

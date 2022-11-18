@@ -2,15 +2,15 @@
 
 While we are now successfully running the Brewz application in Kubernetes, there are some architectural improvements that can be made in order to promote efficiency, scalability, and enable the reduction risk through smaller units of deployment.
 
-Re-examine the current state of the Brews deployment architecture:
+Re-examine the current state of the Brewz deployment architecture:
 
-<img src="../assets/brews-k8s-initial.svg" alt="Initial k8s arch" width="400"/>
+<img src="../assets/brewz-k8s-initial.svg" alt="Initial k8s arch" width="400"/>
 
 Problem statement: It has been noted that at times the `inventory` and `recommendations` services have been an extremely popular feature of the Brewz site. So much that heavy usage of these services have cascaded into a poor experience for users of the entire site.
 
 The way the site is currently architected likely would require scaling both the `api` service as well as the `inventory` and `recommendations` services in order to meet demand. Upon examination of the [api service code](https://github.com/f5devcentral/spa-demo-app/blob/19fd503004a8e3ab5a01eb7eddcac56da165f1c8/api/src/server.js#L121), your developers notice that the api service doesn't provide any real value when calls are made through it to these upstream services. The api service is essentially "passing through" the requests. It would be more efficient and a reduction of code and design complexity to break this simple dependency. We will use NGINX Ingress Controller to route these requests to the originating services themselves so we can update and scale them independently. When our work is complete, this will be the new representation of the deployment architecture:
 
-<img src="../assets/brews-k8s-refactor.svg" alt="Refactored k8s arch" width="600"/>
+<img src="../assets/brewz-k8s-refactor.svg" alt="Refactored k8s arch" width="600"/>
 
 Let's make it happen...
 
@@ -76,7 +76,9 @@ The goal of this refactoring is to make changes to the deployment architecture w
 
 1. Open the Argo CD UI to ensure that the changes to the Virtual Server have been deployed successfully.
 
-1. Additionally, use the **Brewz** UDF access method to explore the deployed app in your browser and ensure it still functions correctly.
+    > **Note:** In the UDF environment, at times Argo CD may not immediately detect and deploy the changes. If this is the case, click the **Refresh** button on the **brewz** application in Argo CD.
+
+1. Use the **Brewz** UDF access method to explore the deployed app in your browser and ensure it still functions correctly.
 
 ## Scale the services independently
 
@@ -112,13 +114,17 @@ Now that the services have been decoupled, we will independently scale the `inve
 
 1. Save and commit the `app.yaml` file to the local repository, and push the changes to your remote GitHub repository.
 
-1. Open the Argo CD UI to ensure that the changes to the Virtual Server have been deployed successfully. Note the number of replicas for the `inventory` pod have now been scaled to 3. You can also examine this by running the following command locally:
+1. Open the Argo CD UI to ensure that the changes to the Virtual Server have been deployed successfully.
+
+    > **Note:** In the UDF environment, at times Argo CD may not immediately detect and deploy the changes. If this is the case, click the **Refresh** button on the **brewz** application in Argo CD.
+
+    In the **brewz** app details, note the number of replicas for the `inventory` pod have now been scaled to 3. You can also examine this by running the following command locally:
 
     ```bash
     kubectl get pods
     ```
 
-    > How many pods for the `inventory` service do you see?
+    How many pods for the `inventory` service do you see?
 
 ## Remove unused code
 
