@@ -31,6 +31,9 @@ spec:
     - name: spa-dark
       service: spa-dark
       port: 80
+    - name: checkout
+      service: checkout
+      port: 8003
   routes:
     - path: /
       matches:
@@ -71,3 +74,8 @@ spec:
         proxy:
           upstream: api
           rewritePath: /images
+    - path: /api/order
+      action:
+        proxy:
+          upstream: checkout
+          rewritePath: /api/order
